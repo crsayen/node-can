@@ -38,6 +38,19 @@ exports.createRawChannel = function(channel, timestamps, protocol)
     return new can.RawChannel(channel, timestamps, protocol, false);
 }
 
+exports.makeSender = function (channel) {
+    return ({ id, data }) => {
+        var canmsg = {
+            id: id,
+            ext: id > 0x7FF,
+            rtr: false,
+            data : Buffer.from(data, 'hex')
+        };
+        channel.send(canmsg);
+    }
+}
+
+
 /**
  * @method createRawChannel
  * @param channel {string} Channel name (e.g. vcan0)
@@ -414,24 +427,6 @@ DatabaseService.prototype.send = function (msg_name) {
         _signals.encode_signal(canmsg.data, s.bitOffset, s.bitLength,
       s.endianess == 'little', s.type == 'signed', word1, word2 );
     }
-
-    this.channel.send(canmsg);
-}
-
-/**
- * Construct a CAN message and encode all related signals according
- * the rules. Finally send the message to the bus.
- * @method sendOne
- * @param msg the message to send
- * @for DatabaseService
- */
-DatabaseService.prototype.sendOne = function ({id, data}) {
-    var canmsg = {
-        id: id,
-        ext: id > 0x7FF,
-        rtr: false,
-        data : Buffer.from(data, 'hex')
-    };
 
     this.channel.send(canmsg);
 }
