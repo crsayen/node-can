@@ -44,7 +44,7 @@ exports.makeSender = function (channel) {
             id: id,
             ext: id > 0x7FF,
             rtr: false,
-            data : Buffer.from(data, 'hex')
+            data : typeof data == 'string' ? Buffer.from(data, 'hex') : data
         };
         channel.send(canmsg);
     }
